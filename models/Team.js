@@ -1,33 +1,16 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-  },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user',
-  },
-  imageUrl: {
-    type: String,
-    default: 'https://example.com/default-profile.png', // Replace with your default image URL
-  },
-}, {
-  timestamps: true,
+const teamSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  tasks: [
+    {
+      title: { type: String, required: true },
+      description: { type: String },
+      status: { type: String, enum: ['pending', 'done', 'backlog'], default: 'pending' },
+    },
+  ],
 });
 
 module.exports = mongoose.model('Team', teamSchema);
