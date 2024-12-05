@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express();
 const connect = require('./database/connectDB');
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const handler = require('./middlewares/handler')
 const cors = require('cors')
@@ -16,8 +18,10 @@ app.use(express.urlencoded({
 
 connect();
 
-app.use('/api/users', userRoutes);
-app.use('/api/teams', teamRoutes);
+app.use('/api/auth', authRoutes); // Authentication Routes
+app.use('/api/users', userRoutes); // User Routes
+app.use('/api/admin', adminRoutes); // Admin Routes
+app.use('/api/teams', teamRoutes); // Team Routes
 
 app.use(handler)
 

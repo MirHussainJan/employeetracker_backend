@@ -1,16 +1,13 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../controllers/userController');
-const { authMiddleware, adminMiddleware } = require('../middlewares/authMiddleware');
+const { getUserProfile, updateUserProfile } = require('../controllers/userController');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-// Public Routes
-router.post('/register', registerUser); // Register a user
-router.post('/login', loginUser);       // User login
+// Get User Profile
+router.get('/profile', authMiddleware, getUserProfile);
 
-// Protected Admin Routes (Example)
-router.get('/admin/users', authMiddleware, adminMiddleware, (req, res) => {
-  res.send('Admin route for managing users');
-});
+// Update User Profile
+router.put('/profile', authMiddleware, updateUserProfile);
 
 module.exports = router;

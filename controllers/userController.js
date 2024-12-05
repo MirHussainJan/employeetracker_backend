@@ -1,38 +1,30 @@
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
-// Register User
-exports.registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
-
+// Get User Profile
+exports.getUserProfile = async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
-    await user.save();
-    res.status(201).json(user);
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    res.json(user);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
-// Login User
-exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+// Update User Profile
+exports.updateUserProfile = async (req, res) => {
+  const { name, email } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials.' });
+    user.name = name || user.name;
+    user.email = email || user.email;
+    await user.save();
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    });
-
-    res.json({ token, user });
+    res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
